@@ -1,86 +1,73 @@
-import pygame
-from cube import *
+import glfw
+import logging
+import sys
+import numpy
+import cube
+#from cube import *
+from ctypes import *
 import time
-from camera import camera
 from FreeCam import FreeCam
-import OpenGL
-from pygame.locals import *
+import custom_shaders
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
-fps = 0
-elapsed = 0
+# visit https://rdmilligan.wordpress.com/2016/08/27/opengl-shaders-using-python/ for python OpenGL shader example
 
+def main():
+    # glfw init
+    if not glfw.init():
+        logging.error("glfw init failed")
+        exit(0)
 
-def limitFps(maxFps, clock):
-    global fps
-    global elapsed
-    elapsed += clock.tick(maxFps)
-    fps += 1
-    if elapsed >= 1000:
-        elapsed = 0
-        fps = 0
+    glfw.window_hint(glfw.SAMPLES, 4)
+    glfw.window_hint(glfw.DOUBLEBUFFER, GL_TRUE)
+    glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_ANY_PROFILE)
 
+    window = glfw.create_window(1024, 768, "3D", None, None)
+    if not window:
+        logging.error("Couldn't create window")
+        glfw.terminate()
+        exit(0)
+    glfw.make_context_current(window)
+    glfw.set_input_mode(window, glfw.STICKY_KEYS, GL_TRUE)
 
-def main(maxFps = 50):
-
-    # pygame init
-    pygame.init()
-    display = (800, 600)
-    pygame.display.set_mode(display, DOUBLEBUF | OPENGL | OPENGLBLIT)
-    image = pygame.image.load("San.png").convert()
-    pygame.display.set_caption("Text")
-    pygame.display.set_icon(image)
-    pygame.mouse.set_visible(False)
-    clock = pygame.time.Clock()
-
-    # openGL init
+    # OpenGL init
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
     gluPerspective(80, 800 / 600, 0.1, 500)  # fov
     glEnable(GL_DEPTH_TEST)  # explicit
-    cam = FreeCam()
-    # main loop
-    while True:
-        start = time.time()
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    cam.keys['left'] = True
-                if event.key == pygame.K_RIGHT:
-                    cam.keys['right'] = True
-                if event.key == pygame.K_UP:
-                    cam.keys['up'] = True
-                if event.key == pygame.K_DOWN:
-                    cam.keys['down'] = True
-            if event.type == pygame.KEYUP:
-                if event.key == pygame.K_LEFT:
-                    cam.keys['left'] = False
-                if event.key == pygame.K_RIGHT:
-                    cam.keys['right'] = False
-                if event.key == pygame.K_UP:
-                    cam.keys['up'] = False
-                if event.key == pygame.K_DOWN:
-                    cam.keys['down'] = False
 
-        cam.compute_move(start)
+    # Vertex array obj creation
+    vao = glGenVertexArrays(1)
+    glBindVertexArray(vao)
+
+    vertex_array = numpy.array([[-1.0, -1.0, 0.0], [1.0, -1.0, 0.0], [0.0,  1.0, 0.0]], dtype='f')
+
+    # Vertex buffer obj creation
+    vbo = glGenBuffers(1)
+    glBindBuffer(GL_ARRAY_BUFFER, vbo)
+    glBufferData(GL_ARRAY_BUFFER, sys.getsizeof(vertex_array), vertex_array, GL_STATIC_DRAW)
+
+    # using custom shader to draw the vbo
+    shader_program = custom_shaders.load_shaders()
+    glUseProgram(shader_program)
+
+    while not glfw.window_should_close(window) and glfw.get_key(window, glfw.KEY_ESCAPE) != glfw.PRESS:
+        glfw.poll_events()
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        glMatrixMode(GL_MODELVIEW)
-        glLoadIdentity()
 
-        cam.look()
-        # draw static object
-        #drawAxes()
-        #drawFloor()
-        drawFullCube()
-        glFlush()
+        glUseProgram(shader_program)
 
-        pygame.display.flip()
+        glEnableVertexAttribArray(0)
+        glBindBuffer(GL_ARRAY_BUFFER, vbo)
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, None)
+        glDrawArrays(GL_TRIANGLES, 0, 3)
+        glDisableVertexAttribArray(0)
 
-        limitFps(maxFps, clock)
+        glfw.swap_buffers(window)
+
+    glfw.terminate()
 
 
 main()
