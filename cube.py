@@ -1,5 +1,5 @@
 import pygame
-import OpenGL
+import numpy
 from pygame.locals import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
@@ -140,39 +140,3 @@ def drawFloor():
     glEnd()
 
     glPopMatrix()
-
-
-def test_main():
-    pygame.init()
-    display = (800, 600)
-    pygame.display.set_mode(display, DOUBLEBUF | OPENGL)
-
-    gluPerspective(70, 800 / 600, 0.1, 1000)
-    glEnable(GL_DEPTH_TEST)
-    glPointSize(5)
-
-    gluLookAt(0, -5, 0, 0, 0, 0, 0, 0, 1)
-
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-        # clean and display rotating cube
-
-        glRotatef(1, 3, 1, 1)
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-
-        # glMatrixMode(GL_MODELVIEW)
-        # glLoadIdentity()
-
-        drawFullCube()
-        #drawVertices()
-        #drawEdges()
-
-        pygame.display.flip()
-        pygame.time.wait(10)
-
-        glFlush()
-
-# test_main()

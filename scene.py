@@ -42,7 +42,43 @@ def main():
     vao = glGenVertexArrays(1)
     glBindVertexArray(vao)
 
-    vertex_array = numpy.array([[-1.0, -1.0, 0.0], [1.0, -1.0, 0.0], [0.0,  1.0, 0.0]], dtype='f')
+    vertex_array = numpy.array([[-1.0, -1.0, -1.0],  # triangle 1 : begin
+                                [-1.0, -1.0, 1.0],
+                                [-1.0, 1.0, 1.0],  # triangle 1 : end
+                                [1.0, 1.0, -1.0],  # triangle 2 : begin
+                                [-1.0, -1.0, -1.0],
+                                [-1.0, 1.0, -1.0],  # triangle 2 : end
+                                [1.0, -1.0, 1.0],
+                                [-1.0, -1.0, -1.0],
+                                [1.0, -1.0, -1.0],
+                                [1.0, 1.0, -1.0],
+                                [1.0, -1.0, -1.0],
+                                [-1.0, -1.0, -1.0],
+                                [-1.0, -1.0, -1.0],
+                                [-1.0, 1.0, 1.0],
+                                [-1.0, 1.0, -1.0],
+                                [1.0, -1.0, 1.0],
+                                [-1.0, -1.0, 1.0],
+                                [-1.0, -1.0, -1.0],
+                                [-1.0, 1.0, 1.0],
+                                [-1.0, -1.0, 1.0],
+                                [1.0, -1.0, 1.0],
+                                [1.0, 1.0, 1.0],
+                                [1.0, -1.0, -1.0],
+                                [1.0, 1.0, -1.0],
+                                [1.0, -1.0, -1.0],
+                                [1.0, 1.0, 1.0],
+                                [1.0, -1.0, 1.0],
+                                [1.0, 1.0, 1.0],
+                                [1.0, 1.0, -1.0],
+                                [-1.0, 1.0, -1.0],
+                                [1.0, 1.0, 1.0],
+                                [-1.0, 1.0, -1.0],
+                                [-1.0, 1.0, 1.0],
+                                [1.0, 1.0, 1.0],
+                                [-1.0, 1.0, 1.0],
+                                [1.0, -1.0, 1.0]],
+                               dtype='f')
 
     # Vertex buffer obj creation
     vbo = glGenBuffers(1)
@@ -75,7 +111,7 @@ def main():
         glEnableVertexAttribArray(0)
         glBindBuffer(GL_ARRAY_BUFFER, vbo)
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, None)
-        glDrawArrays(GL_TRIANGLES, 0, 3)
+        glDrawArrays(GL_TRIANGLES, 0, 12*3)
         glDisableVertexAttribArray(0)
 
         glfw.swap_buffers(window)
