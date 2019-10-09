@@ -10,6 +10,7 @@ from FreeCam import FreeCam
 import custom_shaders
 from OpenGL.GL import *
 from OpenGL.GLU import *
+import glm
 
 # visit https://rdmilligan.wordpress.com/2016/08/27/opengl-shaders-using-python/ for python OpenGL shader example
 
@@ -52,12 +53,24 @@ def main():
     shader_program = custom_shaders.load_shaders()
     glUseProgram(shader_program)
 
+    # creation of MVP matrix
+    projection = glm.perspective(glm.radians(80.0), 4/3, 0.1, 100)
+    # camera matrix
+    view = glm.lookAt(glm.vec3(4, 3, 3), glm.vec3(0, 0, 0), glm.vec3(0, 1, 0))
+    # model matrix
+    model = glm.mat4(1.0)
+    mvp_matrix = projection * view * model
+    # Giving the MVP matrix to GLSL
+    matrixID = glGetUniformLocation(shader_program, "MVP")
+    glUniformMatrix4fv(matrixID, 1, GL_FALSE, glm.value_ptr(mvp_matrix))
+
     while not glfw.window_should_close(window) and glfw.get_key(window, glfw.KEY_ESCAPE) != glfw.PRESS:
         glfw.poll_events()
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
         glUseProgram(shader_program)
+        glUniformMatrix4fv(matrixID, 1, GL_FALSE, glm.value_ptr(mvp_matrix))
 
         glEnableVertexAttribArray(0)
         glBindBuffer(GL_ARRAY_BUFFER, vbo)
