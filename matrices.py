@@ -1,5 +1,6 @@
 import numpy
 from OpenGL.GL import *
+import glfw
 import glm
 
 
@@ -10,10 +11,12 @@ class Matrices:
         self.mvp_matrix = None
         self.matrixID = None
 
-    def create_mvp(self):
+    def compute_mvp(self, position=[4, 3, 3], direction=[0, 0, 0], up=[0, 1, 0]):
         projection = glm.perspective(glm.radians(80.0), 4 / 3, 0.1, 100)
         # camera matrix
-        view = glm.lookAt(glm.vec3(self.cam_pos[0], self.cam_pos[1], self.cam_pos[2]), glm.vec3(0, 0, 0), glm.vec3(0, 1, 0))
+        view = glm.lookAt(glm.vec3(position[0], position[1], position[2]),
+                          glm.vec3(direction[0], direction[1], direction[2]),
+                          glm.vec3(up[0], up[1], up[2]))
         # model matrix
         model = glm.mat4(1.0)
         self.mvp_matrix = projection * view * model

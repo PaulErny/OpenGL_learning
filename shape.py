@@ -31,9 +31,6 @@ class Shape(Matrices):
             glBindBuffer(GL_ARRAY_BUFFER, self.color_buffer)
             glBufferData(GL_ARRAY_BUFFER, sys.getsizeof(self.color_array), self.color_array, GL_STATIC_DRAW)
 
-        # creation of MVP matrix
-        self.create_mvp()
-
     def draw(self):
         glUseProgram(self.shader_program)
         glUniformMatrix4fv(self.matrixID, 1, GL_FALSE, glm.value_ptr(self.mvp_matrix))
