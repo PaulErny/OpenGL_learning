@@ -12,6 +12,16 @@ import glm
 
 # visit https://rdmilligan.wordpress.com/2016/08/27/opengl-shaders-using-python/ for python OpenGL shader example
 
+triangle_vertices = numpy.array([[2.0, 0.0, -1.0],
+                                 [0.0, 0.0, -1.0],
+                                 [0.0,  2.0, -1.0]],
+                                dtype='f')
+
+triangle_color = numpy.array([[1.0, 0.0, 0.0],
+                              [1.0, 0.0, 0.0],
+                              [1.0,  0.0, 0.0]],
+                             dtype='f')
+
 cube_vertex_array = numpy.array([[-1.0, -1.0, -1.0],  # triangle 1 : begin
                                  [-1.0, -1.0, 1.0],
                                  [-1.0, 1.0, 1.0],  # triangle 1 : end
@@ -120,12 +130,16 @@ def main():
     cube = Shape(cube_vertex_array, cube_color_array)
     cube.init()
 
+    triangle = Shape(triangle_vertices, triangle_color)
+    triangle.init()
+
     while not glfw.window_should_close(window) and glfw.get_key(window, glfw.KEY_ESCAPE) != glfw.PRESS:
         glfw.poll_events()
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
         cube.draw()
+        triangle.draw()
 
         glfw.swap_buffers(window)
 
