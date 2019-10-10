@@ -7,13 +7,12 @@ import numpy
 
 from shape import *
 import obj
+import custom_shaders
 
 # visit https://rdmilligan.wordpress.com/2016/08/27/opengl-shaders-using-python/ for python OpenGL shader example
 
 
 def main():
-    global vertex_array
-    global color_array
     # glfw init
     if not glfw.init():
         logging.error("glfw init failed")
@@ -39,10 +38,12 @@ def main():
     vao = glGenVertexArrays(1)
     glBindVertexArray(vao)
 
-    cube = Shape(obj.cube_vertex_array, obj.cube_color_array)
+    shader_program = custom_shaders.load_shaders()
+
+    cube = Shape([4, 3, 3], shader_program, obj.cube_vertex_array, obj.cube_color_array)
     cube.init()
 
-    triangle = Shape(obj.triangle_vertices, obj.triangle_color)
+    triangle = Shape([4, 3, 3], shader_program, obj.triangle_vertices, obj.triangle_color)
     triangle.init()
 
     while not glfw.window_should_close(window) and glfw.get_key(window, glfw.KEY_ESCAPE) != glfw.PRESS:

@@ -1,18 +1,16 @@
-import pygame
 import numpy
-from pygame.locals import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
 import glm
 import sys
 import custom_shaders
+from matrices import Matrices
 
 
-class Shape:
-    def __init__(self, vertex_array, color_array=None):
-        self.shader_program = None
-        self.matrixID = None
-        self.mvp_matrix = None
+class Shape(Matrices):
+    def __init__(self, cam_pos, shader_program, vertex_array, color_array=None):
+        Matrices.__init__(self, cam_pos, shader_program)
+        self.shader_program = shader_program
         self.color_buffer = None
         self.vbo = None
         self.vertex_array = vertex_array
@@ -25,7 +23,6 @@ class Shape:
         glBufferData(GL_ARRAY_BUFFER, sys.getsizeof(self.vertex_array), self.vertex_array, GL_STATIC_DRAW)
 
         # using custom shader to draw the vbo
-        self.shader_program = custom_shaders.load_shaders()
         glUseProgram(self.shader_program)
 
         # Vertex buffer obj creation for cube's color
@@ -35,15 +32,7 @@ class Shape:
             glBufferData(GL_ARRAY_BUFFER, sys.getsizeof(self.color_array), self.color_array, GL_STATIC_DRAW)
 
         # creation of MVP matrix
-        projection = glm.perspective(glm.radians(80.0), 4 / 3, 0.1, 100)
-        # camera matrix
-        view = glm.lookAt(glm.vec3(4, 3, 3), glm.vec3(0, 0, 0), glm.vec3(0, 1, 0))
-        # model matrix
-        model = glm.mat4(1.0)
-        self.mvp_matrix = projection * view * model
-        # Giving the MVP matrix to GLSL
-        self.matrixID = glGetUniformLocation(self.shader_program, "MVP")
-        glUniformMatrix4fv(self.matrixID, 1, GL_FALSE, glm.value_ptr(self.mvp_matrix))
+        self.create_mvp()
 
     def draw(self):
         glUseProgram(self.shader_program)
