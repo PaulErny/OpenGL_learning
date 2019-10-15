@@ -1,8 +1,8 @@
 import numpy
 
-triangle_vertices = numpy.array([[2.0, 0.0, -1.0],
-                                 [0.0, 0.0, -1.0],
-                                 [0.0,  2.0, -1.0]],
+triangle_vertices = numpy.array([[2.0, 0.0, -2.0],
+                                 [0.0, 0.0, -2.0],
+                                 [0.0,  2.0, -2.0]],
                                 dtype='f')
 
 triangle_color = numpy.array([[1.0, 0.0, 0.0],

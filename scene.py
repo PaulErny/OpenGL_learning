@@ -73,6 +73,8 @@ def main():
     # OpenGL init
     glEnable(GL_DEPTH_TEST)  # explicit
     glDepthFunc(GL_LESS)
+    # enabling backface culling to draw only the triangles facing the camera
+    glEnable(GL_CULL_FACE)  # if there are holes in models => invert normals / vertices in 3D modeler (blender, ...)
 
     # Vertex array obj creation
     vao = glGenVertexArrays(1)
