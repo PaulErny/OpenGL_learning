@@ -1,5 +1,6 @@
 import glm
 import numpy
+from check_opti import CheckOpti
 
 
 class ObjParser:

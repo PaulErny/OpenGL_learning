@@ -11,6 +11,7 @@ from shape import *
 import obj
 import custom_shaders
 from matrices import Matrices
+from check_opti import CheckOpti
 
 # visit https://rdmilligan.wordpress.com/2016/08/27/opengl-shaders-using-python/ for python OpenGL shader example
 
@@ -53,6 +54,9 @@ def compute_matrices_from_inputs(window, elapsed):
     return [position, position + direction, up]
 
 def main():
+    opti = CheckOpti()
+    opti.start()
+
     # glfw init
     if not glfw.init():
         logging.error("glfw init failed")
@@ -105,8 +109,11 @@ def main():
 
         glfw.swap_buffers(window)
         start = glfw.get_time()
+        break  # rm after optimization checked
 
     glfw.terminate()
+    opti.end()
 
 
-main()
+if __name__ == '__main__':
+    main()
