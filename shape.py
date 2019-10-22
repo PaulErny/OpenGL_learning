@@ -5,15 +5,22 @@ import glm
 import sys
 import custom_shaders
 from matrices import Matrices
+from obj_parser import ObjParser
 
 
 class Shape(Matrices):
-    def __init__(self, cam_pos, shader_program, vertex_array, color_array=None):
+    def __init__(self, cam_pos, shader_program, file_path=None, vertex_array=None, color_array=None):
         Matrices.__init__(self, cam_pos, shader_program)
         self.shader_program = shader_program
         self.color_buffer = None
         self.vbo = None
-        self.vertex_array = vertex_array
+
+        if file_path is not None:
+            self.obj = ObjParser()
+            self.obj.get_shape(file_path)
+            self.vertex_array = self.obj.out_vertices
+        else:
+            self.vertex_array = vertex_array
         self.color_array = color_array
 
     def init(self):

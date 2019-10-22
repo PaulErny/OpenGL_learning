@@ -82,10 +82,10 @@ def main():
 
     shader_program = custom_shaders.load_shaders()
 
-    cube = Shape([4, 3, 3], shader_program, obj.cube_vertex_array, obj.cube_color_array)
+    cube = Shape([4, 3, 3], shader_program, file_path="resources/cube.obj", color_array=obj.cube_color_array)
     cube.init()
 
-    triangle = Shape([4, 3, 3], shader_program, obj.triangle_vertices, obj.triangle_color)
+    triangle = Shape([4, 3, 3], shader_program, vertex_array=obj.triangle_vertices, color_array=obj.triangle_color)
     triangle.init()
 
     start = glfw.get_time()
