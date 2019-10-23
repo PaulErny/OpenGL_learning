@@ -6,7 +6,6 @@ import sys
 import custom_shaders
 from matrices import Matrices
 from obj_parser import ObjParser
-from check_opti import CheckOpti
 
 
 class Shape(Matrices):

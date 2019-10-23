@@ -1,6 +1,5 @@
 import glm
 import numpy
-from check_opti import CheckOpti
 
 
 class ObjParser:
@@ -51,5 +50,10 @@ class ObjParser:
     def process_data(self):
         for i in self.indices:
             self.out_vertices.append(self.vertices[i[0] - 1])
+        for i in self.indices:
+            self.out_uvs.append(self.uv[i[1] - 1])
+        for i in self.indices:
+            self.out_normals.append(self.normals[i[2] - 1])
         self.out_vertices = numpy.array(self.out_vertices, dtype='f')
-        # TODO out_normals and out_uvs
+        self.out_normals = numpy.array(self.out_normals, dtype='f')
+        self.out_uvs = numpy.array(self.out_uvs, dtype='f')
