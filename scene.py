@@ -105,7 +105,7 @@ def main():
 
         glfw.swap_buffers(window)
         start = glfw.get_time()
-        break  # rm after optimization checked
+        #break  # rm after optimization checked
 
     glfw.terminate()
 

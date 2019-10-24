@@ -22,6 +22,10 @@ class Matrices:
         self.mvp_matrix = projection * view * model
         self.matrixID = glGetUniformLocation(self.shader_program, "MVP")
         glUniformMatrix4fv(self.matrixID, 1, GL_FALSE, glm.value_ptr(self.mvp_matrix))
+        self.matrixID = glGetUniformLocation(self.shader_program, "M")
+        glUniformMatrix4fv(self.matrixID, 1, GL_FALSE, glm.value_ptr(model))
+        self.matrixID = glGetUniformLocation(self.shader_program, "V")
+        glUniformMatrix4fv(self.matrixID, 1, GL_FALSE, glm.value_ptr(view))
 
     def rotate(self):
         pass

@@ -14,12 +14,33 @@ def load_shaders():
             layout(location = 0) in vec3 vertexPosition_modelspace;
             // Notice that the "1" here equals the "1" in glVertexAttribPointer
             layout(location = 1) in vec3 vertexColor;
+            layout(location = 2) in vec3 vertexNormal_modelspace;
             
             out vec3 fragmentColor;
+            out vec3 LightDirection_cameraspace;
+            out vec3 Normal_cameraspace;
             uniform mat4 MVP;
+            uniform mat4 M;
+            uniform mat4 V;
             
             void main() {
               gl_Position =  MVP * vec4(vertexPosition_modelspace,1);
+              
+              vec3 LightPosition_worldspace = vec3(5, 5, 5);
+              // Position of the vertex, in worldspace : M * position
+              vec3 Position_worldspace = (M * vec4(vertexPosition_modelspace,1)).xyz;
+              
+              // Vector that goes from the vertex to the camera, in camera space.
+              // In camera space, the camera is at the origin (0,0,0).
+              vec3 vertexPosition_cameraspace = ( V * M * vec4(vertexPosition_modelspace,1)).xyz;
+              vec3 EyeDirection_cameraspace = vec3(0,0,0) - vertexPosition_cameraspace;
+              
+              // Vector that goes from the vertex to the light, in camera space. M is ommited because it's identity.
+              vec3 LightPosition_cameraspace = ( V * vec4(LightPosition_worldspace,1)).xyz;
+              LightDirection_cameraspace = LightPosition_cameraspace + EyeDirection_cameraspace;
+              
+              // Normal of the the vertex, in camera space
+              Normal_cameraspace = ( V * M * vec4(vertexNormal_modelspace,0)).xyz; // Only correct if ModelMatrix does not scale the model ! Use its inverse transpose if not.
               
               // The color of each vertex will be interpolated
               // to produce the color of each fragment
@@ -33,12 +54,21 @@ def load_shaders():
             
             // Interpolated values from the vertex shaders
             in vec3 fragmentColor;
+            in vec3 LightDirection_cameraspace;
+            in vec3 Normal_cameraspace;
             out vec3 color;
             
             void main(){
+              // Normal of the computed fragment, in camera space
+              vec3 n = normalize( Normal_cameraspace );
+              // Direction of the light (from the fragment to the light)
+              vec3 l = normalize( LightDirection_cameraspace );
+              vec3 lightColor = vec3(1, 1, 1);
+              float cosTheta = clamp( dot(n, l), 0, 1);
+              
               // Output color = color specified in the vertex shader,
               // interpolated between all 3 surrounding vertices
-              color = fragmentColor;
+              color = fragmentColor * lightColor * cosTheta;  //cosTheta should be devided by distance * distance
             }
         """
 

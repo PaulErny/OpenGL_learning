@@ -3,6 +3,10 @@ import numpy
 
 
 class ObjParser:
+    """
+    simple .obj files parser, won't work with articulated obj or any complex .obj file
+    -Only vertices, normals and texture coordinates are processed
+    """
     def __init__(self):
         self.uv = []
         self.vertices = []
@@ -50,9 +54,7 @@ class ObjParser:
     def process_data(self):
         for i in self.indices:
             self.out_vertices.append(self.vertices[i[0] - 1])
-        for i in self.indices:
             self.out_uvs.append(self.uv[i[1] - 1])
-        for i in self.indices:
             self.out_normals.append(self.normals[i[2] - 1])
         self.out_vertices = numpy.array(self.out_vertices, dtype='f')
         self.out_normals = numpy.array(self.out_normals, dtype='f')
