@@ -19,6 +19,7 @@ def load_shaders():
             out vec3 fragmentColor;
             out vec3 LightDirection_cameraspace;
             out vec3 Normal_cameraspace;
+            out float distance;
             uniform mat4 MVP;
             uniform mat4 M;
             uniform mat4 V;
@@ -26,7 +27,10 @@ def load_shaders():
             void main() {
               gl_Position =  MVP * vec4(vertexPosition_modelspace,1);
               
-              vec3 LightPosition_worldspace = vec3(5, 5, 5);
+              vec3 LightPosition_worldspace = vec3(1, 7, 1);
+              distance = sqrt(pow(LightPosition_worldspace.x - vertexPosition_modelspace.x, 2) + 
+                              pow(LightPosition_worldspace.y - vertexPosition_modelspace.y, 2) + 
+                              pow(LightPosition_worldspace.z - vertexPosition_modelspace.z, 2));
               // Position of the vertex, in worldspace : M * position
               vec3 Position_worldspace = (M * vec4(vertexPosition_modelspace,1)).xyz;
               
@@ -56,19 +60,22 @@ def load_shaders():
             in vec3 fragmentColor;
             in vec3 LightDirection_cameraspace;
             in vec3 Normal_cameraspace;
+            in float distance;
             out vec3 color;
             
             void main(){
+              int lightPower = 60;
               // Normal of the computed fragment, in camera space
               vec3 n = normalize( Normal_cameraspace );
               // Direction of the light (from the fragment to the light)
               vec3 l = normalize( LightDirection_cameraspace );
               vec3 lightColor = vec3(1, 1, 1);
+              vec3 MaterialAmbientColor = vec3(0.1,0.1,0.1) * fragmentColor;
               float cosTheta = clamp( dot(n, l), 0, 1);
               
               // Output color = color specified in the vertex shader,
               // interpolated between all 3 surrounding vertices
-              color = fragmentColor * lightColor * cosTheta;  //cosTheta should be devided by distance * distance
+              color = MaterialAmbientColor + fragmentColor * lightColor * lightPower * cosTheta / (distance * distance);  //cosTheta should be devided by distance * distance
             }
         """
 
