@@ -15,15 +15,18 @@ class Shape(Matrices):
         self.color_buffer = None
         self.vbo = None
         self.normals_buffer = None
+        self.element_buffer = None
 
         if file_path is not None:
             self.obj = ObjParser()
             self.obj.get_shape(file_path)
-            self.vertex_array = self.obj.out_vertices
-            self.vertex_normals = self.obj.out_normals
+            self.vertex_array = self.obj.indexed_vertices
+            self.vertex_normals = self.obj.indexed_normals  # TODO add indexed_uvs instead of color
+            self.indices_array = self.obj.out_indices
         else:
             self.vertex_array = vertex_array
             self.vertex_normals = None
+            self.indices_array = None
         self.color_array = color_array
 
     def init(self):
@@ -44,21 +47,25 @@ class Shape(Matrices):
             self.normals_buffer = glGenBuffers(1)
             glBindBuffer(GL_ARRAY_BUFFER, self.normals_buffer)
             glBufferData(GL_ARRAY_BUFFER, sys.getsizeof(self.vertex_normals), self.vertex_normals, GL_STATIC_DRAW)
+        if self.indices_array is not None:
+            self.element_buffer = glGenBuffers(1)
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.element_buffer)
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, sys.getsizeof(self.indices_array), self.indices_array, GL_STATIC_DRAW)
+
 
     def draw(self):
         glUseProgram(self.shader_program)
         glUniformMatrix4fv(self.matrixID, 1, GL_FALSE, glm.value_ptr(self.mvp_matrix))
 
-        # normal buffer
-        if self.vertex_normals is not None:
-            glEnableVertexAttribArray(2)
-            glBindBuffer(GL_ARRAY_BUFFER, self.normals_buffer)
-            glVertexAttribPointer(2,
-                                  3,
-                                  GL_FLOAT,
-                                  GL_FALSE,
-                                  0,
-                                  None)
+        # vertex buffer
+        glEnableVertexAttribArray(0)
+        glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
+        glVertexAttribPointer(0,  # attribute. No particular reason for 0, but must match the layout in the shader.
+                              3,
+                              GL_FLOAT,
+                              GL_FALSE,
+                              0,
+                              None)
         # color buffer
         if self.color_array is not None:
             glEnableVertexAttribArray(1)
@@ -69,17 +76,19 @@ class Shape(Matrices):
                                   GL_FALSE,
                                   0,
                                   None)
-        # vertex buffer
-        glEnableVertexAttribArray(0)
-        glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
-        glVertexAttribPointer(0,  # attribute. No particular reason for 0, but must match the layout in the shader.
-                              3,
-                              GL_FLOAT,
-                              GL_FALSE,
-                              0,
-                              None)
-
-        glDrawArrays(GL_TRIANGLES, 0, len(self.vertex_array))
+        # normal buffer
+        if self.vertex_normals is not None:
+            glEnableVertexAttribArray(2)
+            glBindBuffer(GL_ARRAY_BUFFER, self.normals_buffer)
+            glVertexAttribPointer(2,
+                                  3,
+                                  GL_FLOAT,
+                                  GL_FALSE,
+                                  0,
+                                  None)
+        # indexed buffer
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.element_buffer)
+        glDrawElements(GL_TRIANGLES, len(self.indices_array) * 3, GL_UNSIGNED_INT, None)
         glDisableVertexAttribArray(0)
         # color end
         if self.color_array is not None:

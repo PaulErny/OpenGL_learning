@@ -15,6 +15,11 @@ class ObjParser:
         self.out_vertices = []
         self.out_normals = []
         self.out_uvs = []
+        self.out_indices = []
+        self.indexed_vertices = []
+        self.indexed_normals = []
+        self.indexed_uvs = []
+        self.tmp_index = 0
 
     def get_shape(self, file):
         f = open(file, 'r')
@@ -56,6 +61,50 @@ class ObjParser:
             self.out_vertices.append(self.vertices[i[0] - 1])
             self.out_uvs.append(self.uv[i[1] - 1])
             self.out_normals.append(self.normals[i[2] - 1])
-        self.out_vertices = numpy.array(self.out_vertices, dtype='f')
-        self.out_normals = numpy.array(self.out_normals, dtype='f')
-        self.out_uvs = numpy.array(self.out_uvs, dtype='f')
+        #self.out_vertices = numpy.array(self.out_vertices, dtype='f')
+        #self.out_normals = numpy.array(self.out_normals, dtype='f')
+        #self.out_uvs = numpy.array(self.out_uvs, dtype='f')
+        self.index_vbo()
+
+    @staticmethod
+    def _is_near(v1, v2):
+        return abs(v1 - v2) < 0.01
+
+    def _get_similar_vertex_index(self, in_vertex, in_uv, in_normal):
+        for i in range(len(self.indexed_vertices)):
+            if (
+                self._is_near(in_vertex[0], self.indexed_vertices[i][0]) and
+                self._is_near(in_vertex[1], self.indexed_vertices[i][1]) and
+                self._is_near(in_vertex[2], self.indexed_vertices[i][2]) and
+                self._is_near(in_uv[0], self.indexed_uvs[i][0]) and
+                self._is_near(in_uv[1], self.indexed_uvs[i][1]) and
+                self._is_near(in_normal[0], self.indexed_normals[i][0]) and
+                self._is_near(in_normal[1], self.indexed_normals[i][1]) and
+                self._is_near(in_normal[2], self.indexed_normals[i][2])
+            ):
+                self.tmp_index = i
+                return True
+        return False
+
+    def index_vbo(self):
+        triangle_vertices_array = []
+        for i in range(len(self.out_vertices)):
+            self.tmp_index = 0
+            found = self._get_similar_vertex_index(self.out_vertices[i], self.out_uvs[i], self.out_normals[i])
+            if found:
+                # self.out_indices.append(self.tmp_index)
+                triangle_vertices_array.append(self.tmp_index)
+            else:
+                self.indexed_vertices.append(self.out_vertices[i])
+                self.indexed_uvs.append(self.out_uvs[i])
+                self.indexed_normals.append(self.out_normals[i])
+                self.tmp_index = len(self.indexed_vertices) - 1
+                triangle_vertices_array.append(self.tmp_index)
+            if len(triangle_vertices_array) >= 3:
+                self.out_indices.append(numpy.array(triangle_vertices_array, dtype='i2'))  # by default 'i' = 'i4' = int32  --> i2 = int16
+                triangle_vertices_array.clear()
+
+        self.indexed_vertices = numpy.array(self.indexed_vertices, dtype='f')
+        self.indexed_uvs = numpy.array(self.indexed_uvs, dtype='f')
+        self.indexed_normals = numpy.array(self.indexed_normals, dtype='f')
+        self.out_indices = numpy.array(self.out_indices, dtype='i')

@@ -75,6 +75,7 @@ def main():
     glDepthFunc(GL_LESS)
     # enabling backface culling to draw only the triangles facing the camera
     glEnable(GL_CULL_FACE)  # if there are holes in models => invert normals / vertices in 3D modeler (blender, ...)
+    #glClearColor(0.3, 0.3, 0.3, 0.0)
 
     # Vertex array obj creation
     vao = glGenVertexArrays(1)
@@ -85,8 +86,8 @@ def main():
     cube = Shape([4, 3, 3], shader_program, file_path="resources/cube.obj", color_array=obj.cube_color_array)
     cube.init()
 
-    triangle = Shape([4, 3, 3], shader_program, vertex_array=obj.triangle_vertices, color_array=obj.triangle_color)
-    triangle.init()
+    #triangle = Shape([4, 3, 3], shader_program, vertex_array=obj.triangle_vertices, color_array=obj.triangle_color)
+    #triangle.init()
 
     start = glfw.get_time()
     glfw.set_cursor_pos(window, 1024 / 2, 768 / 2)
@@ -98,10 +99,10 @@ def main():
 
         matrices = compute_matrices_from_inputs(window, glfw.get_time() - start)
         cube.compute_mvp(matrices[0], matrices[1], matrices[2])
-        triangle.compute_mvp(matrices[0], matrices[1], matrices[2])
+        #triangle.compute_mvp(matrices[0], matrices[1], matrices[2])
 
         cube.draw()
-        triangle.draw()
+        #triangle.draw()
 
         glfw.swap_buffers(window)
         start = glfw.get_time()

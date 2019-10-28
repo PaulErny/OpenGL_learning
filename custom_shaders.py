@@ -27,7 +27,7 @@ def load_shaders():
             void main() {
               gl_Position =  MVP * vec4(vertexPosition_modelspace,1);
               
-              vec3 LightPosition_worldspace = vec3(1, 7, 1);
+              vec3 LightPosition_worldspace = vec3(5, 5, 5);
               distance = sqrt(pow(LightPosition_worldspace.x - vertexPosition_modelspace.x, 2) + 
                               pow(LightPosition_worldspace.y - vertexPosition_modelspace.y, 2) + 
                               pow(LightPosition_worldspace.z - vertexPosition_modelspace.z, 2));
@@ -75,7 +75,7 @@ def load_shaders():
               
               // Output color = color specified in the vertex shader,
               // interpolated between all 3 surrounding vertices
-              color = MaterialAmbientColor + fragmentColor * lightColor * lightPower * cosTheta / (distance * distance);  //cosTheta should be devided by distance * distance
+              color = MaterialAmbientColor + fragmentColor * lightColor * lightPower * cosTheta / (distance * distance);
             }
         """
 
