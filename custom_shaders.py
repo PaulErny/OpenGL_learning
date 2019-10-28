@@ -20,6 +20,7 @@ def load_shaders():
             out vec3 LightDirection_cameraspace;
             out vec3 Normal_cameraspace;
             out float distance;
+
             uniform mat4 MVP;
             uniform mat4 M;
             uniform mat4 V;
@@ -28,12 +29,11 @@ def load_shaders():
               gl_Position =  MVP * vec4(vertexPosition_modelspace,1);
               
               vec3 LightPosition_worldspace = vec3(5, 5, 5);
-              distance = sqrt(pow(LightPosition_worldspace.x - vertexPosition_modelspace.x, 2) + 
-                              pow(LightPosition_worldspace.y - vertexPosition_modelspace.y, 2) + 
-                              pow(LightPosition_worldspace.z - vertexPosition_modelspace.z, 2));
               // Position of the vertex, in worldspace : M * position
               vec3 Position_worldspace = (M * vec4(vertexPosition_modelspace,1)).xyz;
               
+              distance = length( LightPosition_worldspace - Position_worldspace );
+
               // Vector that goes from the vertex to the camera, in camera space.
               // In camera space, the camera is at the origin (0,0,0).
               vec3 vertexPosition_cameraspace = ( V * M * vec4(vertexPosition_modelspace,1)).xyz;
